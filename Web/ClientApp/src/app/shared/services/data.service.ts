@@ -8,7 +8,7 @@ export class DataService {
     constructor(private httpClient: HttpClient)
     { }
 
-    baseUrl = "https://localhost:44367/";
+    baseUrl = "/";
 
     get<T>(apiUrl: string) {
         return this.httpClient.get<T>(this.buildUrl(apiUrl), { headers: this.getDefaultHeaders() });

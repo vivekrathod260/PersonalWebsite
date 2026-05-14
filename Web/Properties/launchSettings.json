@@ -26,7 +26,9 @@
       "launchUrl": "",
       "applicationUrl": "https://localhost:44367;http://localhost:44427",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DevServerPort": "4164",
+        "MaxAttempts": "30"
       }
     },
     "IIS Express": {
