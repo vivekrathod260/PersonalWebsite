@@ -19,6 +19,7 @@
   <ItemGroup>
     <Folder Include="ClientApp\src\app\shared\models\" />
     <Folder Include="ClientApp\src\app\shared\services\" />
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
 </Project>
