@@ -1,0 +1,125 @@
+import { Component, Input, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Profile, Social, ContactForm } from '../../core/models/portfolio.models';
+import { PortfolioService } from '../../core/services/portfolio.service';
+
+@Component({
+  selector: 'app-contact',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
+    <section id="contact">
+      <div class="section-container">
+        <h2 class="section-title">Get In <span class="gradient-text">Touch</span></h2>
+        <p class="section-subtitle">Let's work together</p>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <!-- Contact info -->
+          <div class="space-y-6">
+            <div class="glass p-6">
+              <h3 class="text-lg font-semibold text-white mb-4">Contact Information</h3>
+              <div class="space-y-4">
+                <div class="flex items-center gap-3" *ngIf="profile?.email">
+                  <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500">Email</p>
+                    <p class="text-gray-200 text-sm">{{ profile?.email }}</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3" *ngIf="profile?.location">
+                  <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500">Location</p>
+                    <p class="text-gray-200 text-sm">{{ profile?.location }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Socials -->
+            <div class="glass p-6" *ngIf="socials.length">
+              <h3 class="text-lg font-semibold text-white mb-4">Social Links</h3>
+              <div class="flex flex-wrap gap-3">
+                <a *ngFor="let social of socials" [href]="social.url" target="_blank"
+                   class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary/30 transition-all">
+                  <span class="text-sm">{{ social.icon || social.platform.charAt(0) }}</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact form -->
+          <div class="glass p-6">
+            <form (ngSubmit)="onSubmit()" class="space-y-4">
+              <div>
+                <input type="text" [(ngModel)]="form.name" name="name" placeholder="Your Name"
+                       class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-gray-200 placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-colors text-sm" />
+              </div>
+              <div>
+                <input type="email" [(ngModel)]="form.email" name="email" placeholder="Your Email"
+                       class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-gray-200 placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-colors text-sm" />
+              </div>
+              <div>
+                <input type="text" [(ngModel)]="form.subject" name="subject" placeholder="Subject"
+                       class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-gray-200 placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-colors text-sm" />
+              </div>
+              <div>
+                <textarea [(ngModel)]="form.message" name="message" rows="5" placeholder="Your Message"
+                          class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-gray-200 placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-colors text-sm resize-none"></textarea>
+              </div>
+              <button type="submit" [disabled]="sending()" class="btn-primary w-full disabled:opacity-50">
+                {{ sending() ? 'Sending...' : 'Send Message' }}
+              </button>
+              <p *ngIf="successMessage()" class="text-green-400 text-sm text-center">{{ successMessage() }}</p>
+              <p *ngIf="errorMessage()" class="text-red-400 text-sm text-center">{{ errorMessage() }}</p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  `,
+})
+export class ContactComponent {
+  @Input() profile: Profile | null = null;
+  @Input() socials: Social[] = [];
+
+  private portfolioService = inject(PortfolioService);
+
+  form: ContactForm = { name: '', email: '', subject: '', message: '' };
+  sending = signal(false);
+  successMessage = signal('');
+  errorMessage = signal('');
+
+  onSubmit() {
+    if (!this.form.name || !this.form.email || !this.form.message) {
+      this.errorMessage.set('Please fill in all required fields.');
+      return;
+    }
+
+    this.sending.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
+
+    this.portfolioService.submitContact(this.form).subscribe({
+      next: (res) => {
+        this.successMessage.set(res.message);
+        this.form = { name: '', email: '', subject: '', message: '' };
+        this.sending.set(false);
+      },
+      error: () => {
+        this.errorMessage.set('Failed to send message. Please try again.');
+        this.sending.set(false);
+      },
+    });
+  }
+}

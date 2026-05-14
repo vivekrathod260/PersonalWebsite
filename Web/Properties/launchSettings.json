@@ -27,7 +27,7 @@
       "applicationUrl": "https://localhost:44367;http://localhost:44427",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "DevServerPort": "4164",
+        "DevServerPort": "4444",
         "MaxAttempts": "30"
       }
     },

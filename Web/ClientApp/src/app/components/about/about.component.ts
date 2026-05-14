@@ -1,0 +1,43 @@
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Profile } from '../../core/models/portfolio.models';
+
+@Component({
+  selector: 'app-about',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <section id="about" class="relative">
+      <div class="section-container">
+        <h2 class="section-title">About <span class="gradient-text">Me</span></h2>
+        <p class="section-subtitle">Get to know me better</p>
+
+        <div class="glass p-8 sm:p-12" *ngIf="profile">
+          <div class="grid md:grid-cols-3 gap-8">
+            <div class="md:col-span-2">
+              <p class="text-gray-300 leading-relaxed text-lg whitespace-pre-line">
+                {{ profile.about }}
+              </p>
+            </div>
+            <div class="space-y-4">
+              <div class="glass p-4" *ngIf="profile.email">
+                <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Email</p>
+                <p class="text-gray-200 text-sm">{{ profile.email }}</p>
+              </div>
+              <div class="glass p-4" *ngIf="profile.location">
+                <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Location</p>
+                <p class="text-gray-200 text-sm">{{ profile.location }}</p>
+              </div>
+              <a [href]="profile.resumeUrl" target="_blank" class="btn-primary block text-center text-sm" *ngIf="profile.resumeUrl">
+                Download Resume
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  `,
+})
+export class AboutComponent {
+  @Input() profile: Profile | null = null;
+}

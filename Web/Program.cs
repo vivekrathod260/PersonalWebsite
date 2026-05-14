@@ -1,52 +1,43 @@
-using Data;
-using Microsoft.EntityFrameworkCore;
+using Web.Middleware;
 using System.Diagnostics;
 using System.Net.Sockets;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddControllers();
 
-builder.Services.AddControllersWithViews();
-builder.Services.AddBusinessServices(); // Add Business Services
+// Add Data & Business services
+builder.Services.AddDataServices(builder.Configuration);
+builder.Services.AddBusinessServices();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add Database
-var connStr = builder.Configuration.GetConnectionString("AppDb");
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connStr));
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy.WithOrigins("http://localhost:4466", "http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
-// Apply migration
-using (var serviceScope = app.Services.CreateScope())
-{
-    var context = serviceScope.ServiceProvider.GetService<AppDbContext>();
-    context?.Database.Migrate();
-}
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();    // 1. Redirect HTTP ? HTTPS
-app.UseStaticFiles();         // 2. Serve files from wwwroot (css/js/images…)
-
-app.UseRouting();             // 3. Match the URL to an endpoint
-
-//app.UseAuthorization();       // 5. Enforce any [Authorize] rules
-
-app.MapControllers();         // attribute-routed controllers
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+//app.UseCors("AllowAngular");
+app.UseRouting();
+app.MapControllers();
 
 // Configure Angular
 app.UseEndpoints(endpoints => {
@@ -117,5 +108,4 @@ app.UseSpa(spa =>
     }
 });
 
-
-app.Run(); // Start application
+app.Run();
