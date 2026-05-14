@@ -1,4 +1,5 @@
 using Data.Configuration;
+using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -22,13 +23,19 @@ public class FirestoreRepository : IFirestoreRepository
     {
         _logger = logger;
         var firebaseSettings = settings.Value;
+        var credentialsJson = Environment.GetEnvironmentVariable(firebaseSettings.FirebaseCredJsonEnvVarName);
 
-        if (!string.IsNullOrEmpty(firebaseSettings.CredentialPath))
+        if (string.IsNullOrWhiteSpace(credentialsJson))
         {
-            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", firebaseSettings.CredentialPath);
+            throw new InvalidOperationException($"Firebase credentials JSON was not found in the '{firebaseSettings.FirebaseCredJsonEnvVarName}' environment variable.");
         }
 
-        _db = FirestoreDb.Create(firebaseSettings.ProjectId);
+        var credential = GoogleCredential.FromJson(credentialsJson);
+        _db = new FirestoreDbBuilder
+        {
+            ProjectId = firebaseSettings.ProjectId,
+            Credential = credential
+        }.Build();
     }
 
     public async Task<T?> GetDocumentAsync<T>(string collection, string documentId) where T : class

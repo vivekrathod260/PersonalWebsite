@@ -28,7 +28,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "DevServerPort": "4444",
-        "MaxAttempts": "30"
+        "MaxAttempts": "30",
+        "FIREBASE_CREDENTIALS_JSON": ""
       }
     },
     "IIS Express": {
