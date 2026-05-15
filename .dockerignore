@@ -1,0 +1,6 @@
+**/bin/
+**/obj/
+**/node_modules/
+.git/
+.vs/
+Web/firebase-credentials.json
