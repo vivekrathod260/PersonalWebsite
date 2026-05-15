@@ -1,0 +1,31 @@
+<section id="experience">
+  <div class="section-container">
+    <h2 class="section-title">Work <span class="gradient-text">Experience</span></h2>
+    <p class="section-subtitle">My professional journey</p>
+
+    <div class="relative">
+      <!-- Timeline line -->
+      <div class="absolute left-4 md:left-1/2 md:-translate-x-px top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary to-secondary"></div>
+
+      <div *ngFor="let exp of experiences; let i = index; let odd = odd"
+           class="relative flex flex-col md:flex-row items-start mb-12 last:mb-0"
+           [class.md:flex-row-reverse]="odd">
+        <!-- Timeline dot -->
+        <div class="absolute left-4 md:left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-primary border-2 border-dark-900 z-10"></div>
+
+        <!-- Content card -->
+        <div class="ml-12 md:ml-0 md:w-[calc(50%-2rem)]" [class.md:mr-auto]="!odd" [class.md:ml-auto]="odd">
+          <div class="glass p-6 hover:border-primary/30 transition-all duration-300">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-lg font-semibold text-white">{{ exp.role }}</h3>
+              <span *ngIf="exp.current" class="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">Current</span>
+            </div>
+            <p class="text-primary font-medium text-sm mb-2">{{ exp.company }}</p>
+            <p class="text-gray-500 text-xs mb-3">{{ exp.startDate }} — {{ exp.current ? 'Present' : exp.endDate }}</p>
+            <p class="text-gray-400 text-sm leading-relaxed">{{ exp.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

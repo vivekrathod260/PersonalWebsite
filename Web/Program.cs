@@ -1,95 +1,111 @@
-using Data;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer;
-using Microsoft.AspNetCore.SpaServices;
-using Microsoft.AspNetCore.SpaServices.Extensions;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
-using System.Net.Sockets;
+using Web.Middleware;
 using System.Diagnostics;
+using System.Net.Sockets;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddControllers();
 
-builder.Services.AddControllersWithViews();
-builder.Services.AddBusinessServices(); // Add Business Services
+// Add Data & Business services
+builder.Services.AddDataServices(builder.Configuration);
+builder.Services.AddBusinessServices();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add Database
-var connStr = builder.Configuration.GetConnectionString("AppDb");
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connStr));
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy.WithOrigins("http://localhost:4466", "http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
-// Apply migration
-using (var serviceScope = app.Services.CreateScope())
-{
-    var context = serviceScope.ServiceProvider.GetService<AppDbContext>();
-    context?.Database.Migrate();
-}
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();    // 1. Redirect HTTP ? HTTPS
-app.UseStaticFiles();         // 2. Serve files from wwwroot (css/js/images…)
-
-app.UseRouting();             // 3. Match the URL to an endpoint
-
-app.UseAuthorization();       // 5. Enforce any [Authorize] rules
-
-app.MapControllers();         // 6. Hook up your attribute-routed controllers
-
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+//app.UseCors("AllowAngular");
+app.UseRouting();
+app.MapControllers();
 
 // Configure Angular
-app.UseEndpoints(endpoints =>
-{
+app.UseEndpoints(endpoints => {
     endpoints.MapControllerRoute("default", "{controller}/{action=Index}/{id?}");
 });
-
 
 // Use proxy in dev
 app.UseSpa(spa =>
 {
-    spa.Options.SourcePath = "ClientApp";
-
     if (!app.Environment.IsDevelopment()) return;
 
-    // spa.UseAngularCliServer(npmScript: "start");
-    
+    spa.Options.SourcePath = "ClientApp";
+
+    int devServerPort = 4466;
+    var envPort = System.Environment.GetEnvironmentVariable("DevServerPort");
+    if (!string.IsNullOrEmpty(envPort) && int.TryParse(envPort, out var parsedPort)) devServerPort = parsedPort;
+
+    int maxAttempts = 30;
+    var envMax = System.Environment.GetEnvironmentVariable("MaxAttempts");
+    if (!string.IsNullOrEmpty(envMax) && int.TryParse(envMax, out var parsedMax))   maxAttempts = parsedMax;
+
+    bool serverAvailable = false;
+    int attempt = 0;
+
     try
     {
-        new TcpClient("localhost", 4466).Close();
-    }
-    catch
-    {
-        Process? process = Process.Start(new ProcessStartInfo("npm.cmd", "start")
+        var process = Process.Start(new ProcessStartInfo("npx", $"ng serve --port {devServerPort}")
         {
             UseShellExecute = true,
             WorkingDirectory = Path.Combine(app.Environment.ContentRootPath, spa.Options.SourcePath)
         });
-        Thread.Sleep(1000);
+
+        // wait for the server to appear
+        attempt = 0;
+        while (attempt < maxAttempts)
+        {
+            try
+            {
+                using var tcp = new TcpClient("localhost", devServerPort);
+                serverAvailable = true;
+                break;
+            }
+            catch
+            {
+                Thread.Sleep(1000);
+                attempt++;
+            }
+        }
+
         if (process != null && process.HasExited)
         {
-            Console.Write("Failed to start Angluar Cli server. Run using command 'npm run start'");
+            Console.WriteLine("Angular CLI process exited prematurely. Start it manually with 'npm run start' in ClientApp.");
         }
     }
-    spa.UseProxyToSpaDevelopmentServer($"http://localhost:4466");
+    catch (System.ComponentModel.Win32Exception)
+    {
+        Console.WriteLine("Failed to start 'npm.cmd'. Ensure Node.js/npm are installed and on PATH.");
+    }
+
+    if (serverAvailable)
+    {
+        Console.WriteLine($"Proxying SPA requests to http://localhost:{devServerPort}");
+        spa.UseProxyToSpaDevelopmentServer($"http://localhost:{devServerPort}");
+    }
+    else
+    {
+        Console.WriteLine($"Dev server not responding on port {devServerPort}. SPA proxy disabled. Start the dev server manually in ClientApp (npm start) or change the port.");
+    }
 });
 
-
-app.Run(); // Start application
+app.Run();

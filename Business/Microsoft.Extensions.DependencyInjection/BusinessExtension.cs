@@ -7,9 +7,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddBusinessServices(this IServiceCollection services)
         {
-            services.AddScoped<ICustomerService, CustomerService>();
-                // .AddScoped<IProductService, ProductService>();
-
+            services.AddScoped<IPortfolioService, PortfolioService>();
             return services;
         }
     }
