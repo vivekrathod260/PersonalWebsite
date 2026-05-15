@@ -34,19 +34,8 @@ import { FooterComponent } from '../../components/footer/footer.component';
     ContactComponent,
     FooterComponent,
   ],
-  template: `
-    <app-navbar [profile]="profile()" [socials]="socials()" />
-    <main>
-      <app-hero [profile]="profile()" />
-      <app-about [profile]="profile()" />
-      <app-experience [experiences]="experiences()" />
-      <app-projects [projects]="projects()" />
-      <app-skills [skillCategories]="skills()" />
-      <app-testimonials [testimonials]="testimonials()" />
-      <app-contact [profile]="profile()" [socials]="socials()" />
-    </main>
-    <app-footer [profile]="profile()" [socials]="socials()" />
-  `,
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
   private portfolioService = inject(PortfolioService);

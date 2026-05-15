@@ -6,65 +6,8 @@ import { Project } from '../../core/models/portfolio.models';
   selector: 'app-projects',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <section id="projects">
-      <div class="section-container">
-        <h2 class="section-title">My <span class="gradient-text">Projects</span></h2>
-        <p class="section-subtitle">Things I've built</p>
-
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div *ngFor="let project of projects"
-               class="glass overflow-hidden group hover:border-primary/30 transition-all duration-300 hover:-translate-y-1">
-            <!-- Image -->
-            <div class="h-48 overflow-hidden bg-dark-700" *ngIf="project.images?.length">
-              <img [src]="project.images[0]" [alt]="project.title"
-                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-            </div>
-            <div class="h-48 bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center"
-                 *ngIf="!project.images?.length">
-              <span class="text-4xl">🚀</span>
-            </div>
-
-            <!-- Content -->
-            <div class="p-6">
-              <div class="flex items-center gap-2 mb-2">
-                <h3 class="text-lg font-semibold text-white">{{ project.title }}</h3>
-                <span *ngIf="project.featured" class="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">Featured</span>
-              </div>
-              <p class="text-gray-400 text-sm mb-4 line-clamp-3">{{ project.description }}</p>
-
-              <!-- Tech stack -->
-              <div class="flex flex-wrap gap-2 mb-4">
-                <span *ngFor="let tech of project.techStack"
-                      class="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md">
-                  {{ tech }}
-                </span>
-              </div>
-
-              <!-- Links -->
-              <div class="flex items-center gap-3">
-                <a *ngIf="project.githubUrl" [href]="project.githubUrl" target="_blank"
-                   class="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-1">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                  Code
-                </a>
-                <a *ngIf="project.liveUrl" [href]="project.liveUrl" target="_blank"
-                   class="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-1">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                  Live
-                </a>
-                <a *ngIf="project.videoUrl" [href]="project.videoUrl" target="_blank"
-                   class="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-1">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                  Demo
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  `,
+  templateUrl: './projects.component.html',
+  styleUrls: ['./projects.component.css'],
 })
 export class ProjectsComponent {
   @Input() projects: Project[] = [];
