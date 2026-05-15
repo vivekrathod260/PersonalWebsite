@@ -1,7 +1,7 @@
 FROM node:20-alpine AS client-build
 WORKDIR /src/Web/ClientApp
 COPY Web/ClientApp/package*.json ./
-RUN npm ci
+RUN npm install --no-audit --no-fund
 COPY Web/ClientApp/ ./
 RUN npm run build
 
