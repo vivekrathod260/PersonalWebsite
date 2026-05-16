@@ -1,5 +1,15 @@
 <app-navbar [profile]="profile()" [socials]="socials()" />
-<main>
+
+<!-- Loading overlay while initial data is fetched -->
+<div *ngIf="loading()" class="min-h-screen flex items-center justify-center pt-16 relative">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm z-20"></div>
+  <div class="relative z-30 flex flex-col items-center">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-primary border-gray-200"></div>
+    <p class="mt-4 text-gray-300">Loading portfolio...</p>
+  </div>
+</div>
+
+<main *ngIf="!loading()">
   <app-hero [profile]="profile()" />
   <app-about [profile]="profile()" />
   <app-experience [experiences]="experiences()" />
@@ -8,4 +18,4 @@
   <app-testimonials [testimonials]="testimonials()" />
   <app-contact [profile]="profile()" [socials]="socials()" />
 </main>
-<app-footer [profile]="profile()" [socials]="socials()" />
+<app-footer *ngIf="!loading()" [profile]="profile()" [socials]="socials()" />
