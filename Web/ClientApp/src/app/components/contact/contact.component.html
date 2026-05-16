@@ -39,9 +39,14 @@
         <div class="glass p-6" *ngIf="socials.length">
           <h3 class="text-lg font-semibold text-white mb-4">Social Links</h3>
           <div class="flex flex-wrap gap-3">
-            <a *ngFor="let social of socials" [href]="social.url" target="_blank"
+            <a *ngFor="let social of socials" [href]="social.url" target="_blank" rel="noopener noreferrer"
                class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary/30 transition-all">
-              <span class="text-sm">{{ social.icon || social.platform.charAt(0) }}</span>
+              <ng-container *ngIf="social.icon; else fallback">
+                <img [src]="social.icon" [alt]="social.platform" class="w-6 h-6 object-contain" />
+              </ng-container>
+              <ng-template #fallback>
+                <span class="text-sm">{{ social.platform.charAt(0) }}</span>
+              </ng-template>
             </a>
           </div>
         </div>
@@ -51,11 +56,11 @@
       <div class="glass p-6">
         <form (ngSubmit)="onSubmit()" class="space-y-4">
           <div>
-            <input type="text" [(ngModel)]="form.name" name="name" placeholder="Your Name"
+            <input required type="text" [(ngModel)]="form.name" name="name" placeholder="Your Name"
                    class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-gray-200 placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-colors text-sm" />
           </div>
           <div>
-            <input type="email" [(ngModel)]="form.email" name="email" placeholder="Your Email"
+            <input required type="email" [(ngModel)]="form.email" name="email" placeholder="Your Email"
                    class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-gray-200 placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-colors text-sm" />
           </div>
           <div>
@@ -63,10 +68,10 @@
                    class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-gray-200 placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-colors text-sm" />
           </div>
           <div>
-            <textarea [(ngModel)]="form.message" name="message" rows="5" placeholder="Your Message"
+            <textarea required [(ngModel)]="form.message" name="message" rows="5" placeholder="Your Message"
                       class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-gray-200 placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-colors text-sm resize-none"></textarea>
           </div>
-          <button type="submit" [disabled]="sending()" class="btn-primary w-full disabled:opacity-50">
+          <button type="submit" [disabled]="sending() || !isFormValid()" class="btn-primary w-full disabled:opacity-50">
             {{ sending() ? 'Sending...' : 'Send Message' }}
           </button>
           <p *ngIf="successMessage()" class="text-green-400 text-sm text-center">{{ successMessage() }}</p>

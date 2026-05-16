@@ -1,6 +1,7 @@
 using Business.DTOs;
 using Business.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace Web.Controllers;
 
@@ -67,6 +68,13 @@ public class PortfolioController : ControllerBase
             string.IsNullOrWhiteSpace(form.Message))
         {
             return BadRequest("Name, email, and message are required.");
+        }
+
+        // Basic server-side email format validation
+        var emailPattern = new Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
+        if (!emailPattern.IsMatch(form.Email))
+        {
+            return BadRequest("Invalid email address.");
         }
 
         await _portfolioService.SubmitContactAsync(form);

@@ -1,6 +1,7 @@
 import { Component, Input, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Profile, Social, ContactForm } from '../../core/models/portfolio.models';
 import { PortfolioService } from '../../core/services/portfolio.service';
 
@@ -22,9 +23,17 @@ export class ContactComponent {
   successMessage = signal('');
   errorMessage = signal('');
 
+  constructor(private sanitizer: DomSanitizer) {}
+
   onSubmit() {
-    if (!this.form.name || !this.form.email || !this.form.message) {
-      this.errorMessage.set('Please fill in all required fields.');
+    // Trim values
+    this.form.name = this.form.name?.trim() || '';
+    this.form.email = this.form.email?.trim() || '';
+    this.form.subject = this.form.subject?.trim() || '';
+    this.form.message = this.form.message?.trim() || '';
+
+    if (!this.isFormValid()) {
+      this.errorMessage.set('Please fill in all required fields with a valid email.');
       return;
     }
 
@@ -43,5 +52,34 @@ export class ContactComponent {
         this.sending.set(false);
       },
     });
+  }
+
+  iconIsUrl(icon?: string) {
+    if (!icon) return false;
+    return /^(https?:)?\/\//.test(icon) || icon.startsWith('/');
+  }
+
+  isSvgContent(icon?: string) {
+    if (!icon) return false;
+    return icon.trim().startsWith('<svg') || icon.includes('<svg');
+  }
+
+  sanitizedIcon(icon?: string): SafeHtml | null {
+    if (!icon) return null;
+    return this.sanitizer.bypassSecurityTrustHtml(icon);
+  }
+
+  validEmail(email?: string) {
+    if (!email) return false;
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  }
+
+  isFormValid() {
+    return Boolean(
+      this.form.name && this.form.name.trim() &&
+      this.form.email && this.form.email.trim() && this.validEmail(this.form.email) &&
+      this.form.message && this.form.message.trim()
+    );
   }
 }

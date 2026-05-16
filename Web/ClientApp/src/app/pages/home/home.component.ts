@@ -76,6 +76,5 @@ export class HomeComponent implements OnInit {
           this.loading.set(false);
         }
       });
-    });
   }
 }
