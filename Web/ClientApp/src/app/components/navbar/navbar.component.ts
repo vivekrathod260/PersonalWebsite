@@ -13,4 +13,19 @@ export class NavbarComponent {
   @Input() profile: Profile | null = null;
   @Input() socials: Social[] = [];
   menuOpen = false;
+  // Smooth-scroll to section with offset for fixed header
+  scrollTo(id: string) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const headerOffset = 70; // adjust if your navbar height differs
+    const elementPosition = el.getBoundingClientRect().top + window.pageYOffset;
+    const offsetPosition = elementPosition - headerOffset;
+    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+  }
+
+  onAnchorClick(event: Event, id: string) {
+    event.preventDefault();
+    this.menuOpen = false;
+    this.scrollTo(id);
+  }
 }
