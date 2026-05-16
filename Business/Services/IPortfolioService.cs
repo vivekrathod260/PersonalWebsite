@@ -11,5 +11,6 @@ public interface IPortfolioService
     Task<List<SkillCategoryDto>> GetSkillsGroupedAsync();
     Task<List<TestimonialDto>> GetTestimonialsAsync();
     Task<List<SocialDto>> GetSocialsAsync();
+    Task<SettingsDto?> GetSettingsAsync();
     Task SubmitContactAsync(ContactFormDto form);
 }

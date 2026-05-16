@@ -69,3 +69,15 @@ export interface ContactForm {
   subject: string;
   message: string;
 }
+
+export interface Settings {
+  showHero?: boolean;
+  showAbout?: boolean;
+  showExperience?: boolean;
+  showProjects?: boolean;
+  showSkills?: boolean;
+  showTestimonials?: boolean;
+  showContact?: boolean;
+  showFooter?: boolean;
+  showNavbar?: boolean;
+}

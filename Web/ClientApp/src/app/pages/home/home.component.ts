@@ -9,6 +9,7 @@ import {
   SkillCategory,
   Testimonial,
   Social,
+  Settings,
 } from '../../core/models/portfolio.models';
 import { HeroComponent } from '../../components/hero/hero.component';
 import { AboutComponent } from '../../components/about/about.component';
@@ -46,6 +47,7 @@ export class HomeComponent implements OnInit {
   experiences = signal<Experience[]>([]);
   skills = signal<SkillCategory[]>([]);
   testimonials = signal<Testimonial[]>([]);
+  settings = signal<Settings | null>(null);
   socials = signal<Social[]>([]);
   loading = signal(true);
 
@@ -60,6 +62,7 @@ export class HomeComponent implements OnInit {
         skills: this.portfolioService.getSkills(),
         testimonials: this.portfolioService.getTestimonials(),
         socials: this.portfolioService.getSocials(),
+        settings: this.portfolioService.getSettings(),
       }).subscribe({
         next: res => {
           this.profile.set(res.profile);
@@ -67,6 +70,7 @@ export class HomeComponent implements OnInit {
           this.experiences.set(res.experiences);
           this.skills.set(res.skills);
           this.testimonials.set(res.testimonials);
+          this.settings.set(res.settings ?? null);
           this.socials.set(res.socials);
           this.loading.set(false);
         },

@@ -60,6 +60,14 @@ public class PortfolioController : ControllerBase
         return Ok(await _portfolioService.GetSocialsAsync());
     }
 
+    [HttpGet("settings")]
+    public async Task<ActionResult<SettingsDto?>> GetSettings()
+    {
+        var settings = await _portfolioService.GetSettingsAsync();
+        if (settings == null) return NotFound();
+        return Ok(settings);
+    }
+
     [HttpPost("contact")]
     public async Task<IActionResult> SubmitContact([FromBody] ContactFormDto form)
     {

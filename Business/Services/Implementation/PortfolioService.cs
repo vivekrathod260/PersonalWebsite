@@ -40,19 +40,19 @@ public class PortfolioService : IPortfolioService
     public async Task<List<ProjectDto>> GetProjectsAsync()
     {
         var projects = await _repo.GetCollectionOrderedAsync<Project>("projects", "order");
-        return projects.Select(MapProject).ToList();
+        return projects.Where(p => p.Visible).Select(MapProject).ToList();
     }
 
     public async Task<List<ProjectDto>> GetFeaturedProjectsAsync()
     {
         var projects = await _repo.GetCollectionOrderedAsync<Project>("projects", "order");
-        return projects.Where(p => p.Featured).Select(MapProject).ToList();
+        return projects.Where(p => p.Featured && p.Visible).Select(MapProject).ToList();
     }
 
     public async Task<List<ExperienceDto>> GetExperiencesAsync()
     {
         var experiences = await _repo.GetCollectionOrderedAsync<Experience>("experiences", "order");
-        return experiences.Select(e => new ExperienceDto
+        return experiences.Where(e => e.Visible).Select(e => new ExperienceDto
         {
             Id = e.Id,
             Company = e.Company,
@@ -60,14 +60,15 @@ public class PortfolioService : IPortfolioService
             Description = e.Description,
             StartDate = e.StartDate,
             EndDate = e.EndDate,
-            Current = e.Current
+            Current = e.Current,
+            Visible = e.Visible
         }).ToList();
     }
 
     public async Task<List<SkillCategoryDto>> GetSkillsGroupedAsync()
     {
         var skills = await _repo.GetCollectionOrderedAsync<Skill>("skills", "order");
-        return skills.GroupBy(s => s.Category)
+        return skills.Where(s => s.Visible).GroupBy(s => s.Category)
             .Select(g => new SkillCategoryDto
             {
                 Category = g.Key,
@@ -77,7 +78,8 @@ public class PortfolioService : IPortfolioService
                     Name = s.Name,
                     Category = s.Category,
                     IconUrl = s.IconUrl,
-                    Proficiency = s.Proficiency
+                    Proficiency = s.Proficiency,
+                    Visible = s.Visible
                 }).ToList()
             }).ToList();
     }
@@ -85,27 +87,48 @@ public class PortfolioService : IPortfolioService
     public async Task<List<TestimonialDto>> GetTestimonialsAsync()
     {
         var testimonials = await _repo.GetCollectionOrderedAsync<Testimonial>("testimonials", "order");
-        return testimonials.Select(t => new TestimonialDto
+        return testimonials.Where(t => t.Visible).Select(t => new TestimonialDto
         {
             Id = t.Id,
             Name = t.Name,
             Company = t.Company,
             Designation = t.Designation,
             Review = t.Review,
-            ImageUrl = t.ImageUrl
+            ImageUrl = t.ImageUrl,
+            Visible = t.Visible
         }).ToList();
     }
 
     public async Task<List<SocialDto>> GetSocialsAsync()
     {
         var socials = await _repo.GetCollectionOrderedAsync<Social>("socials", "order");
-        return socials.Select(s => new SocialDto
+        return socials.Where(s => s.Visible).Select(s => new SocialDto
         {
             Id = s.Id,
             Platform = s.Platform,
             Url = s.Url,
-            Icon = s.Icon
+            Icon = s.Icon,
+            Visible = s.Visible
         }).ToList();
+    }
+
+    public async Task<SettingsDto?> GetSettingsAsync()
+    {
+        var settings = await _repo.GetDocumentAsync<Settings>("settings", "main");
+        if (settings == null) return null;
+
+        return new SettingsDto
+        {
+            ShowHero = settings.ShowHero,
+            ShowAbout = settings.ShowAbout,
+            ShowExperience = settings.ShowExperience,
+            ShowProjects = settings.ShowProjects,
+            ShowSkills = settings.ShowSkills,
+            ShowTestimonials = settings.ShowTestimonials,
+            ShowContact = settings.ShowContact,
+            ShowFooter = settings.ShowFooter,
+            ShowNavbar = settings.ShowNavbar
+        };
     }
 
     public async Task SubmitContactAsync(ContactFormDto form)
@@ -134,6 +157,7 @@ public class PortfolioService : IPortfolioService
         GithubUrl = p.GithubUrl,
         LiveUrl = p.LiveUrl,
         Tags = p.Tags,
-        Featured = p.Featured
+        Featured = p.Featured,
+        Visible = p.Visible
     };
 }
