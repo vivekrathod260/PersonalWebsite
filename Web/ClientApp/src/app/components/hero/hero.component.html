@@ -23,9 +23,9 @@
           </a>
         </div>
       </div>
-      <div class="hidden lg:flex justify-center animate-slide-up" *ngIf="profile?.imageUrl">
+      <div class="flex justify-center animate-slide-up" *ngIf="profile?.imageUrl">
         <div class="relative">
-          <div class="w-80 h-80 rounded-full overflow-hidden border-2 border-primary/30 shadow-2xl shadow-primary/20">
+          <div class="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-2 border-primary/30 shadow-2xl shadow-primary/20">
             <img [src]="profile?.imageUrl" [alt]="profile?.name" class="w-full h-full object-cover" />
           </div>
           <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-primary/10 to-transparent"></div>

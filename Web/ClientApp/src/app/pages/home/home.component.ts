@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { forkJoin } from 'rxjs';
 import { PortfolioService } from '../../core/services/portfolio.service';
 import {
   Profile,
@@ -8,6 +9,7 @@ import {
   SkillCategory,
   Testimonial,
   Social,
+  Settings,
 } from '../../core/models/portfolio.models';
 import { HeroComponent } from '../../components/hero/hero.component';
 import { AboutComponent } from '../../components/about/about.component';
@@ -45,14 +47,38 @@ export class HomeComponent implements OnInit {
   experiences = signal<Experience[]>([]);
   skills = signal<SkillCategory[]>([]);
   testimonials = signal<Testimonial[]>([]);
+  settings = signal<Settings | null>(null);
   socials = signal<Social[]>([]);
+  loading = signal(true);
 
   ngOnInit() {
-    this.portfolioService.getProfile().subscribe(data => this.profile.set(data));
-    this.portfolioService.getProjects().subscribe(data => this.projects.set(data));
-    this.portfolioService.getExperiences().subscribe(data => this.experiences.set(data));
-    this.portfolioService.getSkills().subscribe(data => this.skills.set(data));
-    this.portfolioService.getTestimonials().subscribe(data => this.testimonials.set(data));
-    this.portfolioService.getSocials().subscribe(data => this.socials.set(data));
+    this.loading.set(true);
+    // Load all portfolio data in parallel and update signals once complete
+    // so UI can show a single loading state and avoid flicker.
+    forkJoin({
+        profile: this.portfolioService.getProfile(),
+        projects: this.portfolioService.getProjects(),
+        experiences: this.portfolioService.getExperiences(),
+        skills: this.portfolioService.getSkills(),
+        testimonials: this.portfolioService.getTestimonials(),
+        socials: this.portfolioService.getSocials(),
+        settings: this.portfolioService.getSettings(),
+      }).subscribe({
+        next: res => {
+          this.profile.set(res.profile);
+          this.projects.set(res.projects);
+          this.experiences.set(res.experiences);
+          this.skills.set(res.skills);
+          this.testimonials.set(res.testimonials);
+          this.settings.set(res.settings ?? null);
+          this.socials.set(res.socials);
+          this.loading.set(false);
+        },
+        error: err => {
+          console.error('Failed to load portfolio data', err);
+          // still hide loading to allow the app to render and show errors/placeholders
+          this.loading.set(false);
+        }
+      });
   }
 }

@@ -4,6 +4,11 @@ using System.Net.Sockets;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// server-side in-memory cache for rate-limiting and service caching
+builder.Services.AddMemoryCache();
+// response caching middleware (honors cache headers)
+builder.Services.AddResponseCaching();
+
 builder.Services.AddControllers();
 
 // Add Data & Business services
@@ -34,7 +39,41 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+
+// Serve static files with cache headers
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        var headers = ctx.Context.Response.Headers;
+        var path = ctx.File.PhysicalPath?.ToLowerInvariant() ?? string.Empty;
+
+        if (path.EndsWith(".html"))
+        {
+            headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            headers["Pragma"] = "no-cache";
+            headers["Expires"] = "0";
+            return;
+        }
+
+        if (path.EndsWith(".js") || path.EndsWith(".css") || path.EndsWith(".woff") || path.EndsWith(".woff2") || path.EndsWith(".ttf") || path.EndsWith(".otf"))
+        {
+            headers["Cache-Control"] = "public, max-age=31536000, immutable";
+            return;
+        }
+
+        if (path.EndsWith(".png") || path.EndsWith(".jpg") || path.EndsWith(".jpeg") || path.EndsWith(".svg") || path.EndsWith(".gif") || path.EndsWith(".webp"))
+        {
+            headers["Cache-Control"] = "public, max-age=604800";
+            return;
+        }
+
+        headers["Cache-Control"] = "public, max-age=3600";
+    }
+});
+
+// Enable response caching middleware
+app.UseResponseCaching();
 //app.UseCors("AllowAngular");
 app.UseRouting();
 app.MapControllers();

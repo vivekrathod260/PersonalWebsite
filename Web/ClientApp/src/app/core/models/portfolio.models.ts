@@ -32,8 +32,14 @@ export interface Experience {
   startDate: string;
   endDate: string;
   current: boolean;
+  experienceSkills?: ExperienceSkill[];
 }
 
+export interface ExperienceSkill {
+  name: string;
+  iconUrl?: string;
+  highlight?: boolean;
+}
 export interface SkillCategory {
   category: string;
   skills: Skill[];
@@ -68,4 +74,16 @@ export interface ContactForm {
   email: string;
   subject: string;
   message: string;
+}
+
+export interface Settings {
+  showHero?: boolean;
+  showAbout?: boolean;
+  showExperience?: boolean;
+  showProjects?: boolean;
+  showSkills?: boolean;
+  showTestimonials?: boolean;
+  showContact?: boolean;
+  showFooter?: boolean;
+  showNavbar?: boolean;
 }

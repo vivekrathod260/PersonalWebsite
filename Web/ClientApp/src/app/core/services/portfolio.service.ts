@@ -9,6 +9,7 @@ import {
   Testimonial,
   Social,
   ContactForm,
+  Settings,
 } from '../models/portfolio.models';
 
 @Injectable({ providedIn: 'root' })
@@ -42,6 +43,10 @@ export class PortfolioService {
 
   getSocials(): Observable<Social[]> {
     return this.http.get<Social[]>(`${this.baseUrl}/socials`);
+  }
+
+  getSettings(): Observable<Settings> {
+    return this.http.get<Settings>(`${this.baseUrl}/settings`);
   }
 
   submitContact(form: ContactForm): Observable<{ message: string }> {

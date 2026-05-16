@@ -1,11 +1,21 @@
-<app-navbar [profile]="profile()" [socials]="socials()" />
-<main>
-  <app-hero [profile]="profile()" />
-  <app-about [profile]="profile()" />
-  <app-experience [experiences]="experiences()" />
-  <app-projects [projects]="projects()" />
-  <app-skills [skillCategories]="skills()" />
-  <app-testimonials [testimonials]="testimonials()" />
-  <app-contact [profile]="profile()" [socials]="socials()" />
+<app-navbar *ngIf="!settings() || settings()?.showNavbar" [profile]="profile()" [socials]="socials()" />
+
+<!-- Loading overlay while initial data is fetched -->
+<div *ngIf="loading()" class="min-h-screen flex items-center justify-center pt-16 relative">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm z-20"></div>
+  <div class="relative z-30 flex flex-col items-center">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-primary border-gray-200"></div>
+    <p class="mt-4 text-gray-300">Loading portfolio...</p>
+  </div>
+</div>
+
+<main *ngIf="!loading()">
+  <app-hero *ngIf="!settings() || settings()?.showHero" [profile]="profile()" />
+  <app-about *ngIf="!settings() || settings()?.showAbout" [profile]="profile()" />
+  <app-experience *ngIf="!settings() || settings()?.showExperience" [experiences]="experiences()" />
+  <app-projects *ngIf="!settings() || settings()?.showProjects" [projects]="projects()" />
+  <app-skills *ngIf="!settings() || settings()?.showSkills" [skillCategories]="skills()" />
+  <app-testimonials *ngIf="!settings() || settings()?.showTestimonials" [testimonials]="testimonials()" />
+  <app-contact *ngIf="!settings() || settings()?.showContact" [profile]="profile()" [socials]="socials()" />
 </main>
-<app-footer [profile]="profile()" [socials]="socials()" />
+<app-footer *ngIf="(!loading() && (!settings() || settings()?.showFooter))" [profile]="profile()" [socials]="socials()" />

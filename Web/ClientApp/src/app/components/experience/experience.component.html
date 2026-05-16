@@ -23,6 +23,16 @@
             <p class="text-primary font-medium text-sm mb-2">{{ exp.company }}</p>
             <p class="text-gray-500 text-xs mb-3">{{ exp.startDate }} — {{ exp.current ? 'Present' : exp.endDate }}</p>
             <p class="text-gray-400 text-sm leading-relaxed">{{ exp.description }}</p>
+
+            <!-- Experience-specific skill pills -->
+            <div class="mt-3 flex flex-wrap gap-2">
+              <ng-container *ngFor="let es of exp.experienceSkills || []">
+                <span [class]="'skill-badge text-xs px-2 py-1 rounded-md inline-flex items-center gap-2 ' + (es.highlight ? 'bg-gradient-to-r from-yellow-400/20 to-yellow-200/10 text-yellow-300 animate-glow' : 'bg-white/5 text-gray-200')">
+                  <img *ngIf="es.iconUrl" [src]="es.iconUrl" [alt]="es.name" class="w-4 h-4 object-contain" />
+                  <span>{{ es.name }}</span>
+                </span>
+              </ng-container>
+            </div>
           </div>
         </div>
       </div>
