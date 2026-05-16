@@ -81,3 +81,10 @@
     </div>
   </div>
 </section>
+
+<!-- Floating toast notification -->
+<div *ngIf="toastMessage()" class="fixed bottom-6 right-6 z-50">
+  <div [class]="'max-w-xs px-4 py-3 rounded-lg text-white shadow-lg ' + (toastType() === 'success' ? 'bg-green-600' : 'bg-red-600')">
+    {{ toastMessage() }}
+  </div>
+</div>

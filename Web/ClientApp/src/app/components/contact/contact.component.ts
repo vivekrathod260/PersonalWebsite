@@ -22,6 +22,9 @@ export class ContactComponent {
   sending = signal(false);
   successMessage = signal('');
   errorMessage = signal('');
+  toastMessage = signal('');
+  toastType = signal<'success' | 'error' | ''>('');
+  private toastTimer: any = null;
 
   constructor(private sanitizer: DomSanitizer) {}
 
@@ -34,6 +37,7 @@ export class ContactComponent {
 
     if (!this.isFormValid()) {
       this.errorMessage.set('Please fill in all required fields with a valid email.');
+      this.showToast('Please complete the form with a valid email.', 'error');
       return;
     }
 
@@ -44,11 +48,13 @@ export class ContactComponent {
     this.portfolioService.submitContact(this.form).subscribe({
       next: (res) => {
         this.successMessage.set(res.message);
+        this.showToast(res.message || 'Message sent successfully!', 'success');
         this.form = { name: '', email: '', subject: '', message: '' };
         this.sending.set(false);
       },
       error: () => {
         this.errorMessage.set('Failed to send message. Please try again.');
+        this.showToast('Failed to send message. Please try again.', 'error');
         this.sending.set(false);
       },
     });
@@ -81,5 +87,21 @@ export class ContactComponent {
       this.form.email && this.form.email.trim() && this.validEmail(this.form.email) &&
       this.form.message && this.form.message.trim()
     );
+  }
+
+  showToast(message: string, type: 'success' | 'error') {
+    // clear existing timer
+    if (this.toastTimer) {
+      clearTimeout(this.toastTimer);
+      this.toastTimer = null;
+    }
+    this.toastMessage.set(message || '');
+    this.toastType.set(type || '');
+    // auto-hide after 4 seconds
+    this.toastTimer = setTimeout(() => {
+      this.toastMessage.set('');
+      this.toastType.set('');
+      this.toastTimer = null;
+    }, 4000);
   }
 }
