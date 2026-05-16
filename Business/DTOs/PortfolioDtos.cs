@@ -39,6 +39,7 @@ public class ExperienceDto
     public string EndDate { get; set; } = string.Empty;
     public bool Current { get; set; }
     public bool Visible { get; set; } = true;
+    public List<ExperienceSkillDto> ExperienceSkills { get; set; } = new();
 }
 
 public class SkillDto
@@ -49,6 +50,13 @@ public class SkillDto
     public string IconUrl { get; set; } = string.Empty;
     public int Proficiency { get; set; }
     public bool Visible { get; set; } = true;
+}
+
+public class ExperienceSkillDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string IconUrl { get; set; } = string.Empty;
+    public bool Highlight { get; set; } = false;
 }
 
 public class TestimonialDto

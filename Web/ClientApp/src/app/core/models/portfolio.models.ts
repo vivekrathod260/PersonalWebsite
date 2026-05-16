@@ -32,8 +32,14 @@ export interface Experience {
   startDate: string;
   endDate: string;
   current: boolean;
+  experienceSkills?: ExperienceSkill[];
 }
 
+export interface ExperienceSkill {
+  name: string;
+  iconUrl?: string;
+  highlight?: boolean;
+}
 export interface SkillCategory {
   category: string;
   skills: Skill[];

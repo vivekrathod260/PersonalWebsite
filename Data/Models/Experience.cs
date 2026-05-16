@@ -32,4 +32,7 @@ public class Experience
 
     [FirestoreProperty("visible")]
     public bool Visible { get; set; } = true;
+
+    [FirestoreProperty("experienceSkills")]
+    public List<ExperienceSkill> ExperienceSkills { get; set; } = new List<ExperienceSkill>();
 }

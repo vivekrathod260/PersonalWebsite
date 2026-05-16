@@ -61,7 +61,13 @@ public class PortfolioService : IPortfolioService
             StartDate = e.StartDate,
             EndDate = e.EndDate,
             Current = e.Current,
-            Visible = e.Visible
+            Visible = e.Visible,
+            ExperienceSkills = (e.ExperienceSkills ?? new List<ExperienceSkill>()).Select(es => new ExperienceSkillDto
+            {
+                Name = es.Name,
+                IconUrl = es.IconUrl,
+                Highlight = es.Highlight
+            }).ToList()
         }).ToList();
     }
 
