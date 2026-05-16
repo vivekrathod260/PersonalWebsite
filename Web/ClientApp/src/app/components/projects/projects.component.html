@@ -6,10 +6,28 @@
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div *ngFor="let project of projects"
            class="glass overflow-hidden group hover:border-primary/30 transition-all duration-300 hover:-translate-y-1">
-        <!-- Image -->
-        <div class="h-48 overflow-hidden bg-dark-700" *ngIf="project.images?.length">
-          <img [src]="project.images[0]" [alt]="project.title"
+        <!-- Image carousel -->
+        <div class="relative h-48 overflow-hidden bg-dark-700" *ngIf="project.images?.length"
+             (touchstart)="onTouchStart($event, project)" (touchmove)="onTouchMove($event, project)" (touchend)="onTouchEnd($event, project)">
+          <img [src]="getCurrentImage(project)" [alt]="project.title"
                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+
+          <!-- Left/Right controls -->
+          <button (click)="onPrev(project)" aria-label="Previous" type="button"
+                  class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1">
+            ‹
+          </button>
+          <button (click)="onNext(project)" aria-label="Next" type="button"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-1">
+            ›
+          </button>
+
+          <!-- Dots -->
+          <div class="absolute left-1/2 -translate-x-1/2 bottom-2 flex gap-2">
+            <span *ngFor="let img of project.images; let i = index"
+                  (click)="currentIndexMap[project.id]=i; startTimerForProject(project)"
+                  [class]="'w-2 h-2 rounded-full cursor-pointer ' + (currentIndexMap[project.id]===i ? 'bg-white' : 'bg-white/40')"></span>
+          </div>
         </div>
         <div class="h-48 bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center"
              *ngIf="!project.images?.length">
